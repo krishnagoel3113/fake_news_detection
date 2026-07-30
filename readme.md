@@ -1,0 +1,1 @@
+-  Note: This model is trained on the Kaggle Fake and Real News dataset. It performs best on complete news articles and may not accurately classify very short statements or articles from different writing styles.
