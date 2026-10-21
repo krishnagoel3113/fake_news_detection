@@ -4,51 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fake News Detection</title>
-
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <main class="container">
+        <header>
+            <h1>📰 Fake News Detection</h1>
+            <p class="subtitle">This model classifies news text. Choose a labeled sample below to compare its reference class with the model's prediction.</p>
+        </header>
 
-<div class="container">
+        <section class="samples" aria-labelledby="samples-heading">
+            <h2 id="samples-heading">Try a sample article</h2>
+            <p class="section-note">Demo test examples only. REAL/FAKE labels are intended reference classes, not independent fact-checks of real-world articles.</p>
 
-    <h1>📰 Fake News Detection</h1>
+            <div class="sample-list">
+                <button type="button" class="sample-card"
+                    data-news="The government announced a new public education policy today. Officials said the plan will focus on improving school facilities, teacher training, and access to digital learning resources. Further details are expected to be released by the education department.">
+                    <span class="sample-tag">Sample 1 · Reference class: REAL</span>
+                    <span class="sample-title">Government announces a new education policy</span>
+                    <span class="sample-action">Use this article →</span>
+                </button>
 
-    <p class="subtitle">
-        Paste a complete news article below and let the AI determine whether it is likely Real or Fake.
-    </p>
+                <button type="button" class="sample-card"
+                    data-news="A viral post claims that drinking a special homemade mixture can cure every known disease within three days. The post provides no medical evidence, names no qualified researchers, and urges readers to share the claim immediately.">
+                    <span class="sample-tag">Sample 2 · Reference class: FAKE</span>
+                    <span class="sample-title">Viral post makes a miracle cure claim</span>
+                    <span class="sample-action">Use this article →</span>
+                </button>
 
-    <form action="/predict" method="POST">
+                <button type="button" class="sample-card"
+                    data-news="Researchers at a university have published a report describing a new method for improving solar panel efficiency under laboratory conditions. The team said more testing is needed before the technique can be evaluated for large-scale commercial use.">
+                    <span class="sample-tag">Sample 3 · Reference class: REAL</span>
+                    <span class="sample-title">Researchers report progress in solar technology</span>
+                    <span class="sample-action">Use this article →</span>
+                </button>
+            </div>
+        </section>
 
-        <textarea
-            name="news"
-            placeholder="Paste your news article here..."
-            required>{{ news if news else "" }}</textarea>
+        <section class="analyzer" aria-labelledby="analyzer-heading">
+            <h2 id="analyzer-heading">Analyze news</h2>
+            <form action="/predict" method="POST">
+                <label for="news">News article</label>
+                <textarea
+                    id="news"
+                    name="news"
+                    placeholder="Select one of the predefined samples above..."
+                    required>{{ news if news else "" }}</textarea>
 
-        <div class="buttons">
-            <button type="submit">
-                Detect News
-            </button>
+                <div class="buttons">
+                    <button type="submit" class="detect-button">Detect News</button>
+                    <button type="reset" class="clear-button" id="clear-button">Clear</button>
+                </div>
+            </form>
+        </section>
 
-            <button type="reset">
-                Clear
-            </button>
-        </div>
+        {% if prediction %}
+        <section class="result" aria-live="polite">
+            <h2>Prediction</h2>
+            <p>{{ prediction }}</p>
+            <small>This is the model's text-based prediction, not independent fact-checking.</small>
+        </section>
+        {% endif %}
+    </main>
 
-    </form>
+    <script>
+        const newsInput = document.getElementById("news");
 
-    {% if prediction %}
+        document.querySelectorAll(".sample-card").forEach((card) => {
+            card.addEventListener("click", () => {
+                newsInput.value = card.dataset.news;
+                newsInput.focus();
+                newsInput.scrollIntoView({ behavior: "smooth", block: "center" });
+            });
+        });
 
-    <div class="result">
-
-        <h2>Prediction</h2>
-
-        <p>{{ prediction }}</p>
-
-    </div>
-
-    {% endif %}
-
-</div>
-
+        document.getElementById("clear-button").addEventListener("click", () => {
+            window.setTimeout(() => newsInput.value = "", 0);
+        });
+    </script>
 </body>
 </html>
